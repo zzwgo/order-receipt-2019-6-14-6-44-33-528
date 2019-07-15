@@ -7,47 +7,53 @@ package org.katas.refactoring;
  * total sales tax) and prints it.
  */
 public class OrderReceipt {
-    private static final double sales_tax = 0.1;
+    private static final double SALES_TAX = .10;
     private Order order;
 
     public OrderReceipt(Order order) {
         this.order = order;
     }
 
-
-    void printNameAndAddress(StringBuilder output, Order order) {
-        output.append(order.getCustomerName())
-                .append(order.getCustomerAddress());
+    private void printHeader(StringBuilder output) {
+        output.append("======Printing Orders======\n");
     }
 
-    void printLineItems(StringBuilder output, Order order){
-        // prints lineItems
-        double totalSalesTax = 0d;
-        double totalAmount = 0d;
+    private void printCustomerInfo(StringBuilder output) {
+        output.append(order.getCustomerName()).append(order.getCustomerAddress());
+    }
 
+    private void printTax(StringBuilder output){
+        output.append("Sales Tax").append('\t').append(calculateSalesTax());
+    }
+
+    private void printTotalAmount(StringBuilder output){
+        output.append("Total Amount").append('\t').append(calculateTotalAmount());
+    }
+
+    private double calculateSalesTax() {
+        return order.getLineItems().stream().map(LineItem::totalAmount).mapToDouble(item -> item * SALES_TAX).sum();
+    }
+
+    private double calculateTotalAmount() {
+        return order.getLineItems().stream().mapToDouble(LineItem::totalAmount).sum() + calculateSalesTax();
+    }
+
+    private void printLineItems(StringBuilder output){
         for (LineItem lineItem : order.getLineItems()) {
-            output.append(lineItem.getDescription()).append('\t').append(lineItem.getPrice()).append('\t')
-                    .append(lineItem.getQuantity()).append('\t').append(lineItem.totalAmount()).append('\n');
-
-            // calculate sales tax @ rate of 10%
-            double salesTax = lineItem.totalAmount() * sales_tax;
-            totalSalesTax += salesTax;
-
-            // calculate total amount of lineItem = price * quantity + 10 % sales tax
-            totalAmount += lineItem.totalAmount() + salesTax;
+            output.append(lineItem.getDescription()).append('\t')
+                    .append(lineItem.getPrice()).append('\t')
+                    .append(lineItem.getQuantity()).append('\t')
+                    .append(lineItem.totalAmount()).append('\n');
         }
-
-        // prints the state tax
-        output.append("Sales Tax").append('\t').append(totalSalesTax);
-
-        // print total amount
-        output.append("Total Amount").append('\t').append(totalAmount);
     }
 
     public String printReceipt() {
-        StringBuilder output = new StringBuilder("======Printing Orders======\n");
-        printNameAndAddress(output, order);
-        printLineItems(output,order);
+        StringBuilder output = new StringBuilder();
+        printHeader(output);
+        printCustomerInfo(output);
+        printLineItems(output);
+        printTax(output);
+        printTotalAmount(output);
         return output.toString();
     }
 }
