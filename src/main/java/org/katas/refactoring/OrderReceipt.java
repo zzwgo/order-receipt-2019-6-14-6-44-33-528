@@ -31,11 +31,11 @@ public class OrderReceipt {
     }
 
     private double calculateSalesTax() {
-        return order.getLineItems().stream().map(LineItem::totalAmount).mapToDouble(item -> item * SALES_TAX).sum();
+        return order.getLineItems().stream().map(LineItem::getTotalAmount).mapToDouble(item -> item * SALES_TAX).sum();
     }
 
     private double calculateTotalAmount() {
-        return order.getLineItems().stream().mapToDouble(LineItem::totalAmount).sum() + calculateSalesTax();
+        return order.getLineItems().stream().mapToDouble(LineItem::getTotalAmount).sum() + calculateSalesTax();
     }
 
     private void printLineItems(StringBuilder output){
@@ -43,7 +43,7 @@ public class OrderReceipt {
             output.append(lineItem.getDescription()).append('\t')
                     .append(lineItem.getPrice()).append('\t')
                     .append(lineItem.getQuantity()).append('\t')
-                    .append(lineItem.totalAmount()).append('\n');
+                    .append(lineItem.getTotalAmount()).append('\n');
         }
     }
 
